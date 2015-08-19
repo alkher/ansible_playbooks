@@ -1,0 +1,17 @@
+---
+# Modificación de /etc/hosts
+- hosts: ELK-ES
+
+  tasks:
+  
+  - name: añadir nodos de ELK a /etc/hosts
+    lineinfile: dest=/etc/hosts line="{{ item }}" state=present
+    with_items:
+      - '10.1.1.1    elk.dominio.com elk'
+      - '10.1.1.11   elk-lb1.dominio.com elk-lb1'
+      - '10.1.1.12   elk-lb2.dominio.com elk-lb2'
+      - '10.1.1.21   elk-ls1.dominio.com elk-ls1'
+      - '10.1.1.22   elk-ls2.dominio.com elk-ls2'
+      - '10.1.1.31   elk-es1.dominio.com elk-es1'
+      - '10.1.1.32   elk-es2.dominio.com elk-es2'
+      - '10.1.1.33   elk-es3.dominio.com elk-es3'

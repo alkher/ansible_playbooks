@@ -1,0 +1,9 @@
+---
+- hosts: ELK-LS
+
+  roles:
+    - nginx
+    - redis
+    - elasticsearch
+    - kibana
+    - logstash

@@ -1,0 +1,5 @@
+---
+- hosts: ELK-ES
+
+  roles:
+    - elasticsearch

@@ -1,0 +1,13 @@
+[ELK]
+elk-lb[1:2]      ansible_ssh_user=root
+elk-ls[1:2]      ansible_ssh_user=root
+elk-es[1:3]      ansible_ssh_user=root
+
+[ELK-LB]
+elk-lb[1:2]      ansible_ssh_user=root
+
+[ELK-LS]
+elk-ls[1:2]      ansible_ssh_user=root
+
+[ELK-ES]
+elk-es[1:3]      ansible_ssh_user=root
