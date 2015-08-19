@@ -16,7 +16,7 @@ Requisitos
 Instalar elasticsearch
 **********************
 
-*instalar_es.yml**
+**instalar_es.yml**
 
 Instalación y configuración de eleasticsearch en un stack ELK_.
 
