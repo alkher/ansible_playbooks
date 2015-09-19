@@ -3,7 +3,7 @@
 - hosts: ELK-ES
 
   tasks:
-  
+
   - name: añadir nodos de ELK a /etc/hosts
     lineinfile: dest=/etc/hosts line="{{ item }}" state=present
     with_items:
