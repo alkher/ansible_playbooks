@@ -44,5 +44,13 @@ Añadir elementos a /etc/hosts
 
 Añadir entradas a /etc/hosts.
 
+****************
+Trabajar con LVM
+****************
+
+**linux_lvm.yml**
+
+Crear, eliminar y/o modificar un volumen lógico.
+
 .. _ELK: https://www.elastic.co/products
 .. _ansible: http://www.ansible.com/home

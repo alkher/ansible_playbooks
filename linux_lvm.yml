@@ -3,10 +3,10 @@
 - hosts: servidores
 
   vars:
-  
-    create_lvm: false # Para crear un nuevo volumen lógico poner "true" (extend_lvm y resize_lvm tienen que estar "false")
+
+    create_lvm: false # Para crear un nuevo volumen lógico poner "true" (extend_lvm tiene que estar "false")
+    delete_lvm: false # Para eliminar un volumen lógico poner "true" (extend_lvm tiene que estar "false")
     extend_lvm: false # Para extender el tamaño de un volumen lógico poner "true" (create_lvm tiene que estar "false")
-    resize_lvm: false # Para cambiar el tamaño de un volumen lógico poner "true" (create_lvm tiene que estar "false")
     vgname: 'datos-vg' # Nombre del VG (se crea si create_lvm es true)
     disks: '/dev/sdb' # Discos para el VG (por ejemplo: '/dev/sdb,/dev/sdc,/dev/sdd')
     lvname: 'datos-lv' # Nombre del LV (se crea si es_config_lvm es true)
@@ -14,21 +14,21 @@
     lvsize: '100%FREE' # Tamaño del volumen lógico ( con "10G" se creara un lvm de 10 GB, con "512" se creara con 512 MB)
     filesystem: 'ext4' # Tipo del filesystem del volumen lógico (ext3, ext4, xfs, ...)
     lvextend_opt: '-L+10G' # Opciones que se pasan a lvextend ('-L+10G') se incrementara 10 GB el tamaño, con ('-l +100%FREE') se incrmentará con todo el espacio libre)
-  
+
   tasks:
 
   - name: crear un VG
     lvg: vg={{ vgname }} pvs={{ disks }} state=present
     when: create_lvm
-  
+
   - name: crear un LV
     lvol: vg={{ vgname }} lv={{ lvname }} size={{ lvsize }} state=present
     when: create_lvm
-  
+
   - name: crear el filesystem
     filesystem: fstype={{ filesystem }} dev=/dev/{{ vgname }}/{{ lvname }}
     when: create_lvm
-  
+
   - name: montar el filesystem
     mount: name={{ mntp }} src=/dev/{{ vgname }}/{{ lvname }} fstype={{ filesystem }} state=mounted
     when: create_lvm
@@ -42,5 +42,17 @@
     when: extend_lvm
 
   - name: cambiar el tamaño del filesystem
-    command: resize2fs /dev/{{ vgname }}/{{ lvname }}
-    when: resize_lvm
+    filesystem: dev=/dev/{{ vgname }}/{{ lvname }} resizefs=yes
+    when: extend_lvm
+
+  - name: desmontar el filesystem
+    mount: name={{ mntp }} src=/dev/{{ vgname }}/{{ lvname }} fstype={{ filesystem }} state=unmounted
+    when: delete_lvm
+
+  - name: eliminar un LV
+    lvol: vg={{ vgname }} lv={{ lvname }} size={{ lvsize }} state=absent
+    when: delete_lvm
+
+  - name: eliminar un VG
+    lvg: vg={{ vgname }} pvs={{ disks }} state=absent
+    when: delete_lvm
