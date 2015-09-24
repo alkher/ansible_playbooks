@@ -1,58 +1,56 @@
 ---
-# Trabajar con LVM (probado en CentOS 7)
+# Gestionar LVM en LiNUX
 - hosts: servidores
 
   vars:
 
-    create_lvm: false # Para crear un nuevo volumen lógico poner "true" (extend_lvm tiene que estar "false")
-    delete_lvm: false # Para eliminar un volumen lógico poner "true" (extend_lvm tiene que estar "false")
-    extend_lvm: false # Para extender el tamaño de un volumen lógico poner "true" (create_lvm tiene que estar "false")
-    vgname: 'datos-vg' # Nombre del VG (se crea si create_lvm es true)
-    disks: '/dev/sdb' # Discos para el VG (por ejemplo: '/dev/sdb,/dev/sdc,/dev/sdd')
-    lvname: 'datos-lv' # Nombre del LV (se crea si es_config_lvm es true)
-    mntp: '/datos' # Punto de montaje para el volumen
-    lvsize: '100%FREE' # Tamaño del volumen lógico ( con "10G" se creara un lvm de 10 GB, con "512" se creara con 512 MB)
-    filesystem: 'ext4' # Tipo del filesystem del volumen lógico (ext3, ext4, xfs, ...)
-    lvextend_opt: '-L+10G' # Opciones que se pasan a lvextend ('-L+10G') se incrementara 10 GB el tamaño, con ('-l +100%FREE') se incrmentará con todo el espacio libre)
+    lvm_ope: ''          # Operación que se quiere realizar, los valores posibles son: 'crear', 'borrar' y 'extender'
+    vgname: 'datos-vg'   # Nombre del VG
+    disks: '/dev/sdb'    # Discos para el VG ('/dev/sdb,/dev/sdc,/dev/sdd,...' en el caso de una extensión hay que indicar todos los discos, no solo el que se añade)
+    lvname: 'datos-lv'   # Nombre del LV
+    mnt_point: '/datos'  # Punto de montaje para el LV
+    lvsize: '100%FREE'   # Tamaño del LV ('10G' para un LV de 10 GB, '512' para uno de 512 MB)
+    fs_type: 'ext4'      # Tipo del filesystem para el LV (ext3, ext4, xfs, ...)
+    extend_opt: '-L+10G' # Opciones de lvextend ('-L+10G' para incrementar 10 GB el tamaño, '-l+100%FREE' para usar todo el espacio libre)
 
   tasks:
 
   - name: crear un VG
     lvg: vg={{ vgname }} pvs={{ disks }} state=present
-    when: create_lvm
+    when: lvm_ope == 'crear'
 
   - name: crear un LV
     lvol: vg={{ vgname }} lv={{ lvname }} size={{ lvsize }} state=present
-    when: create_lvm
+    when: lvm_ope == 'crear'
 
   - name: crear el filesystem
-    filesystem: fstype={{ filesystem }} dev=/dev/{{ vgname }}/{{ lvname }}
-    when: create_lvm
+    filesystem: fstype={{ fs_type }} dev=/dev/{{ vgname }}/{{ lvname }}
+    when: lvm_ope == 'crear'
 
   - name: montar el filesystem
-    mount: name={{ mntp }} src=/dev/{{ vgname }}/{{ lvname }} fstype={{ filesystem }} state=mounted
-    when: create_lvm
+    mount: name={{ mnt_point }} src=/dev/{{ vgname }}/{{ lvname }} fstype={{ fs_type }} state=mounted
+    when: lvm_ope == 'crear'
 
   - name: extender un VG
     lvg: vg={{ vgname }} pvs={{ disks }}
-    when: extend_lvm
+    when: lvm_ope == 'extender'
 
   - name: extender LV
-    command: lvextend {{ lvextend_opt }} /dev/{{ vgname }}/{{ lvname }}
-    when: extend_lvm
+    command: lvextend {{ extend_opt }} /dev/{{ vgname }}/{{ lvname }}
+    when: lvm_ope == 'extender'
 
   - name: cambiar el tamaño del filesystem
-    filesystem: dev=/dev/{{ vgname }}/{{ lvname }} resizefs=yes
-    when: extend_lvm
+    command: resize2fs /dev/{{ vgname }}/{{ lvname }}
+    when: lvm_ope == 'extender'
 
   - name: desmontar el filesystem
-    mount: name={{ mntp }} src=/dev/{{ vgname }}/{{ lvname }} fstype={{ filesystem }} state=unmounted
-    when: delete_lvm
+    mount: name={{ mnt_point }} src=/dev/{{ vgname }}/{{ lvname }} fstype={{ fs_type }} state=absent
+    when: lvm_ope == 'borrar'
 
   - name: eliminar un LV
-    lvol: vg={{ vgname }} lv={{ lvname }} size={{ lvsize }} state=absent
-    when: delete_lvm
+    lvol: vg={{ vgname }} lv={{ lvname }} size={{ lvsize }} state=absent force=yes
+    when: lvm_ope == 'borrar'
 
   - name: eliminar un VG
-    lvg: vg={{ vgname }} pvs={{ disks }} state=absent
-    when: delete_lvm
+    lvg: vg={{ vgname }} pvs={{ disks }} state=absent force=yes
+    when: lvm_ope == 'borrar'

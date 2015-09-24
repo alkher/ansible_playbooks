@@ -1,6 +1,6 @@
 ---
 # Modificación de /etc/hosts
-- hosts: ELK-ES
+- hosts: ELK
 
   tasks:
 
