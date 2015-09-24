@@ -39,6 +39,8 @@ Cambiar la contraseña de un usuario.
 Variables
 =========
 
+::
+
 	**usuario**: root        # Usuario
     **password**: $6$1/K.Dax # contraseña [Generada con: mkpasswd --method=SHA-512]
 
@@ -62,6 +64,8 @@ Verificado en CentOS 6 y 7.
 
 Variables
 =========
+
+::
 
 	**lvm_ope**: ''          # Operación que se quiere realizar, los valores posibles son: 'crear', 'borrar' y 'extender'.
     **vgname**: 'datos-vg'   # Nombre del VG.
