@@ -40,8 +40,7 @@ Variables
 =========
 
 ::
-
-	**usuario**: root        # Usuario
+    **usuario**: root        # Usuario
     **password**: $6$1/K.Dax # contraseña [Generada con: mkpasswd --method=SHA-512]
 
 *****************************
@@ -67,7 +66,7 @@ Variables
 
 ::
 
-	**lvm_ope**: ''          # Operación que se quiere realizar, los valores posibles son: 'crear', 'borrar' y 'extender'.
+    **lvm_ope**: ''          # Operación que se quiere realizar, los valores posibles son: 'crear', 'borrar' y 'extender'.
     **vgname**: 'datos-vg'   # Nombre del VG.
     **disks**: '/dev/sdb'    # Discos para el VG ('/dev/sdb,/dev/sdc,/dev/sdd,...'). En el caso de una extensión hay que indicar todos los discos, no solo el que se añade.
     **lvname**: 'datos-lv'   # Nombre del LV.
