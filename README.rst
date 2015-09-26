@@ -76,5 +76,19 @@ Variables
     fs_type: 'ext4'      # Tipo del filesystem para el LV (ext3, ext4, xfs, ...).
     extend_opt: '-L+10G' # Opciones de lvextend ('-L+10G' para incrementar 10 GB el tamaño, '-l+100%FREE' para usar todo el espacio libre).
 
+Notas
+======
+
+Si el LV que se quiere extender corresponde al swap del sistema, el cambio del tamaño del filesystem (resize2fs) generará un error del tipo::
+
+    resize2fs: Bad magic number in super-block while trying to open
+
+Las partciones de swap, tras su extensión, es necesario rehacerlas de la siguiente manera::
+
+    swapoff /dev/vg_swap/lv_swap
+    mkswap /dev/vg_swap/lv_swap
+    swapon /dev/vg_swap/lv_swap
+
+
 .. _ELK: https://www.elastic.co/products
 .. _ansible: http://www.ansible.com/home
